@@ -1,11 +1,23 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from 'next/head';
+import Image from 'next/image';
+import { Inter } from 'next/font/google';
+import styles from '@/styles/Home.module.css';
+import { invoke } from '@tauri-apps/api/tauri';
+import { useEffect } from 'react';
 
-const inter = Inter({ subsets: ['latin'] })
+// Note: When working with Next.js in development you have 2 execution contexts:
+// - The server (nodejs), where Tauri cannot be reached, because the current context is inside of nodejs.
+// - The client (webview), where it is possible to interact with the Tauri rust backend.
+// To check if we are currently executing in the client context, we can check the type of the window object;
+const isClient = typeof window !== 'undefined';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
+
+  const handleOnClick = () => {
+    invoke('greet', { name: 'World' }).then(alert).catch(console.error);
+  };
   return (
     <>
       <Head>
@@ -20,6 +32,7 @@ export default function Home() {
             Get started by editing&nbsp;
             <code className={styles.code}>src/pages/index.tsx</code>
           </p>
+          <button onClick={() => handleOnClick()}>Premi qui</button>
           <div>
             <a
               href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
@@ -49,13 +62,7 @@ export default function Home() {
             priority
           />
           <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
+            <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
           </div>
         </div>
 
@@ -112,12 +119,11 @@ export default function Home() {
               Deploy <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
+              Instantly deploy your Next.js site to a shareable URL with&nbsp;Vercel.
             </p>
           </a>
         </div>
       </main>
     </>
-  )
+  );
 }
